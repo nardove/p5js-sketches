@@ -24,14 +24,29 @@ class Worm {
 
 		this.bodySize = 14;
 
-		this.init(_location);
+		this.init(_location, "left");
 	}
 
 	
-	init(_location) {
+	init(_location, _direction) {
 		for (let i = 0; i < this.numSegments; i++) {
 			let particleWeight = 1 + (i * 0.3);
 			let particlePosition = new Vec2D(_location.x, _location.y);
+			switch(_direction) {
+				case "right":
+					particlePosition.set(_location.x + (i * this.segmentSize), _location.y);
+					break;
+				case "left":
+					particlePosition.set(_location.x - (i * this.segmentSize), _location.y);
+					break;
+				case "top":
+					particlePosition.set(_location.x, _location.y + (i * this.segmentSize));
+					break;
+				case "bottom":
+					particlePosition.set(_location.x, _location.y - (i * this.segmentSize));
+					break;
+			}
+			
 			let particle = new VerletParticle2D(particlePosition, particleWeight);
 			this.particles.push(particle);
 			physics.addParticle(particle);
@@ -138,42 +153,42 @@ class Worm {
 
 
 	checkBounds() {
-		let offset = 60;
+		let offset = this.segmentSize * this.numSegments + this.numSegments;
 		if (this.location.x > width + offset) {
 			console.log("outside right");
-			this.location.x = -offset;
+			this.location.x = -10;
 			this.targetLocation = this.location.copy();
 			this.velocity.scaleSelf(0);
 			this.isDead = true;
 			this.kill();
-			this.init(this.location);
+			this.init(this.location, "left");
 		}
 		if (this.location.x < -offset ) {
 			console.log("outside left");
-			this.location.x = width + offset;
+			this.location.x = width + 10;
 			this.targetLocation = this.location.copy();
 			this.velocity.scaleSelf(0);
 			this.isDead = true;
 			this.kill();
-			this.init(this.location);
+			this.init(this.location, "right");
 		}
 	 	if (this.location.y > height + offset) {
 			console.log("outside bottom");
-	 		this.location.y = -offset;
+	 		this.location.y = -10;
 	 		this.targetLocation = this.location.copy();
 	 		this.velocity.scaleSelf(0);
 			this.isDead = true;
 			this.kill();
-			this.init(this.location);
+			this.init(this.location, "bottom");
 		}
 		if (this.location.y < -offset ) {
 			console.log("outside top");
-			this.location.y = height + offset;
+			this.location.y = height + 10;
 			this.targetLocation = this.location.copy();
 			this.velocity.scaleSelf(0);
 			this.isDead = true;
 			this.kill();
-			this.init(this.location);
+			this.init(this.location, "top");
 		}
 		this.isDead = false;
 	}

@@ -18,6 +18,7 @@ function setup() {
 	gui.add(worm, "maxspeed");
 	gui.add(worm, "maxforce");
 	gui.add(worm, "springStrength").min(0.0001).max(0.01).step(0.0001);
+	gui.close();
 }
 
 function draw() {
