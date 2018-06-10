@@ -95,11 +95,70 @@ class Worm {
 		}
 		endShape();
 		
+		
 		for (let [i, p] of this.particles.entries()) {
+			let dx = 0;
+			let dy = 0;
+			let v1 = new Vec2D(0, 0);
+			let v2 = new Vec2D(0, 0);
+			
+			if (i == 0) {
+				dx = this.particles[1].x - this.particles[0].x;
+				dy = this.particles[1].y - this.particles[0].y;
+			}
+			else {
+				dx = this.particles[i].x - this.particles[i-1].x;
+				dy = this.particles[i].y - this.particles[i-1].y;
+			}
+			
+			if (i == 0) {
+				v1.set(this.particles[0].x, this.particles[0].y);
+				v2.set(this.particles[1].x, this.particles[1].y);
+			}
+			else {
+				v1.set(this.particles[i-1].x, this.particles[i-1].y);
+				v2.set(this.particles[i].x, this.particles[i].y);
+			}
+			
+			let dist = v1.sub(v2).magnitude();
+			let thickness = this.segmentSize * (1 / norm(dist, 0, this.segmentSize));
+			
+			let angle = -atan2(dy, dx);
+			let x1 = this.particles[i].x + sin(angle) * -thickness;
+			let y1 = this.particles[i].y + cos(angle) * -thickness;
+			let x2 = this.particles[i].x + sin(angle) * thickness;
+			let y2 = this.particles[i].y + cos(angle) * thickness;
+			
+			noFill();
+			strokeWeight(2);
+			stroke('#FF0000');
+			line(x1, y1, x2, y2);
+			
 			noStroke();
 			fill('#F2F2F2');
 			ellipse(p.x, p.y, this.bodySize, this.bodySize);
 		}
+		
+		//for (int n = 0; n < numNodes; n++) {
+		//	float dx;
+		//	float dy;
+		//	if (n == 0) {
+		//		dx = node[1].x - node[0].x;
+		//		dy = node[1].y - node[0].y;
+		//	}
+		//	else {
+		//		dx = node[n].x - node[n - 1].x;
+		//		dy = node[n].y - node[n - 1].y;
+		//	}
+		//	float angle = -atan2(dy, dx);
+		//	float x1 = node[n].x + sin(angle) * -skinYspacing;
+		//	float y1 = node[n].y + cos(angle) * -skinYspacing;
+		//	float x2 = node[n].x + sin(angle) *  skinYspacing;
+		//	float y2 = node[n].y + cos(angle) *  skinYspacing;
+		//	float u = skinXspacing * n;
+		//	vertex(x1, y1, u, 0);
+		//	vertex(x2, y2, u, skin.height);
+		//}
 	}
 
 

@@ -10,7 +10,7 @@ function setup() {
 	physics.setDrag(0.02);
 	// physics.setTimeStep(2);
 
-	worm = new Worm(6, 15, new Vec2D(200, 200));
+	worm = new Worm(8, 15, new Vec2D(200, 200));
 
 	gui = new dat.GUI();
 	gui.add(physics, "drag").min(0.8).max(1).step(0.01);
