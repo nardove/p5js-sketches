@@ -8,7 +8,7 @@ class Worm {
 		this.isDead = false;
 
 		this.time = millis();
-		this.wait = 2000;
+		this.wait = 4000;
 		this.tick = false;
 
 		this.location = new Vec2D(200, 200);
@@ -17,7 +17,7 @@ class Worm {
 		this.springStrength = 0.0002;
 
 		this.acceleration = new Vec2D(0, 0);
-		this.maxspeed = 6;
+		this.maxspeed = 5;
 		this.maxforce = 0.1;
 		this.wandertheta = 0;
 		this.targetLocation = this.location.copy();
@@ -30,7 +30,7 @@ class Worm {
 	
 	init(_location, _direction) {
 		for (let i = 0; i < this.numSegments; i++) {
-			let particleWeight = 1 + (i * 0.3);
+			let particleWeight = 1; // + (i * 0.3);
 			let particlePosition = new Vec2D(_location.x, _location.y);
 			switch(_direction) {
 				case "right":
@@ -50,7 +50,7 @@ class Worm {
 			let particle = new VerletParticle2D(particlePosition, particleWeight);
 			this.particles.push(particle);
 			physics.addParticle(particle);
-			physics.addBehavior(new AttractionBehavior(particle, this.segmentSize, -0.2, 0));
+			// physics.addBehavior(new AttractionBehavior(particle, this.segmentSize, -0.1, 0));
 
 			if (i != 0) {
 				let particleA = this.particles[i - 1];
@@ -79,23 +79,19 @@ class Worm {
 
 	render() {
 		noFill();
-		strokeWeight(this.bodySize - 2);
+		strokeWeight(this.bodySize);
 		stroke('#C2C2C2');
 		beginShape();		
 		for (let p of this.particles) {
 			vertex(p.x, p.y);
 		}
 		endShape();
+		
 
-		strokeWeight(this.bodySize - 4);
-		stroke('#616161');
-		beginShape();		
-		for (let p of this.particles) {
-			vertex(p.x, p.y);
-		}
-		endShape();
-		
-		
+		noFill();
+		stroke("#C2C2C2");
+		strokeWeight(1);
+		beginShape(QUAD_STRIP);
 		for (let [i, p] of this.particles.entries()) {
 			let dx = 0;
 			let dy = 0;
@@ -105,17 +101,14 @@ class Worm {
 			if (i == 0) {
 				dx = this.particles[1].x - this.particles[0].x;
 				dy = this.particles[1].y - this.particles[0].y;
-			}
-			else {
-				dx = this.particles[i].x - this.particles[i-1].x;
-				dy = this.particles[i].y - this.particles[i-1].y;
-			}
-			
-			if (i == 0) {
+
 				v1.set(this.particles[0].x, this.particles[0].y);
 				v2.set(this.particles[1].x, this.particles[1].y);
 			}
 			else {
+				dx = this.particles[i].x - this.particles[i-1].x;
+				dy = this.particles[i].y - this.particles[i-1].y;
+
 				v1.set(this.particles[i-1].x, this.particles[i-1].y);
 				v2.set(this.particles[i].x, this.particles[i].y);
 			}
@@ -123,42 +116,29 @@ class Worm {
 			let dist = v1.sub(v2).magnitude();
 			let thickness = this.segmentSize * (1 / norm(dist, 0, this.segmentSize));
 			
+			let n = i / (this.particles.length - 1);
+			let b = bezierPoint(0.5, 2, 2, 0.5, n);
+
 			let angle = -atan2(dy, dx);
-			let x1 = this.particles[i].x + sin(angle) * -thickness;
-			let y1 = this.particles[i].y + cos(angle) * -thickness;
-			let x2 = this.particles[i].x + sin(angle) * thickness;
-			let y2 = this.particles[i].y + cos(angle) * thickness;
+
+			let x1 = this.particles[i].x + sin(angle) * -thickness * b;
+			let y1 = this.particles[i].y + cos(angle) * -thickness * b;
+			let x2 = this.particles[i].x + sin(angle) * thickness * b;
+			let y2 = this.particles[i].y + cos(angle) * thickness * b;
+			vertex(x1, y1);
+			vertex(x2, y2);
 			
-			noFill();
-			strokeWeight(2);
-			stroke('#FF0000');
-			line(x1, y1, x2, y2);
+			// noFill();
+			// strokeWeight(2);
+			// stroke('#F2F2F2');
+			// line(x1, y1, x2, y2);
 			
-			noStroke();
-			fill('#F2F2F2');
-			ellipse(p.x, p.y, this.bodySize, this.bodySize);
+			// noStroke();
+			// fill('#F2F2F2');
+			// ellipse(p.x, p.y, this.bodySize, this.bodySize);
 		}
+		endShape();
 		
-		//for (int n = 0; n < numNodes; n++) {
-		//	float dx;
-		//	float dy;
-		//	if (n == 0) {
-		//		dx = node[1].x - node[0].x;
-		//		dy = node[1].y - node[0].y;
-		//	}
-		//	else {
-		//		dx = node[n].x - node[n - 1].x;
-		//		dy = node[n].y - node[n - 1].y;
-		//	}
-		//	float angle = -atan2(dy, dx);
-		//	float x1 = node[n].x + sin(angle) * -skinYspacing;
-		//	float y1 = node[n].y + cos(angle) * -skinYspacing;
-		//	float x2 = node[n].x + sin(angle) *  skinYspacing;
-		//	float y2 = node[n].y + cos(angle) *  skinYspacing;
-		//	float u = skinXspacing * n;
-		//	vertex(x1, y1, u, 0);
-		//	vertex(x2, y2, u, skin.height);
-		//}
 	}
 
 
