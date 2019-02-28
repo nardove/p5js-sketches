@@ -20,11 +20,11 @@ function setup() {
 
 function initGui() {
 	gui = new dat.GUI();
-	gui.add(physics, "drag").min(0.8).max(1).step(0.01);
+	gui.add(physics, "drag").min(0.9).max(1).step(0.005);
 	gui.add(worm, "wait").min(1000).max(5000).step(500);
 	gui.add(worm, "maxspeed");
 	gui.add(worm, "maxforce");
-	gui.add(worm, "springStrength").min(0.0001).max(0.01).step(0.0001);
+	gui.add(worm, "springStrength").min(0.0001).max(0.001).step(0.0005);
 	gui.close();
 }
 

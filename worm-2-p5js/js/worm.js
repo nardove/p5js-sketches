@@ -23,7 +23,7 @@ class Worm {
         this.wandertheta = 0;
         this.targetLocation = this.location.copy();
 
-        this.bodySize = 7;
+        this.bodySize = 10;
 
         this.init(_location, "left");
     }
@@ -62,7 +62,7 @@ class Worm {
             }
         }
 
-        for (let i = 0; i < this.numSegments * 2; i++) {
+        for (let i = 0; i < (this.numSegments * 2) + 1; i++) {
         	let v = {x: 0, y: 0};
             this.vertices.push(v);
         }
@@ -117,14 +117,14 @@ class Worm {
             let thickness = this.segmentSize * (1 / norm(dist, 0, this.segmentSize));
 
             let n = i / (this.particles.length - 1);
-            let b = bezierPoint(0.15, 1.25, 1.25, 0.15, n);
+            let b = bezierPoint(0.25, 1.5, 1.5, 0.2, n);
 
             let angle = -atan2(dy, dx);
 
-            let x1 = this.particles[i].x + sin(angle) * -thickness * b;
-            let y1 = this.particles[i].y + cos(angle) * -thickness * b;
-            let x2 = this.particles[i].x + sin(angle) * thickness * b;
-            let y2 = this.particles[i].y + cos(angle) * thickness * b;
+            let x1 = this.particles[i].x + sin(angle) * thickness * b;
+            let y1 = this.particles[i].y + cos(angle) * thickness * b;
+            let x2 = this.particles[i].x + sin(angle) * -thickness * b;
+            let y2 = this.particles[i].y + cos(angle) * -thickness * b;
 
             this.vertices[i].x = x1;
             this.vertices[i].y = y1;
@@ -132,37 +132,41 @@ class Worm {
             this.reverseVertices[i].y = y2;
         }
 
+        let numVertices = this.vertices.length - 1;
         reverse(this.reverseVertices);
         for (let i = 0; i < this.numSegments; i++) {
         	this.vertices[i + this.numSegments] = this.reverseVertices[i];
         }
+        this.vertices[numVertices] = this.vertices[0];
 
-        noFill();
-        strokeWeight(this.bodySize * 0.3);
-
-        stroke('#C2C2C2');
+        fill('#212121');
+        strokeWeight(2);
+        stroke('#B2B2B2');
+        // noStroke();
         beginShape();
-        vertex(this.vertices[0].x, this.vertices[0].y);
-        for (let i = 0; i < this.vertices.length; i++) {
-	        	let v = this.vertices[i];
-	        	let vv = (i < this.vertices.length - 1) ? this.vertices[i + 1] : this.vertices[i];
-	            let ax = (v.x + vv.x) * 0.5;
-	        	let ay = (v.y + vv.y) * 0.5;
-	            bezierVertex(v.x, v.y, vv.x, vv.y, ax, ay);
+        curveVertex(this.vertices[numVertices].x, this.vertices[numVertices].y);
+        for (let i = 0; i <= numVertices; i++) {
+        	let v = this.vertices[i];
+            curveVertex(v.x, v.y);
+            // ellipse(v.x, v.y, 50, 50);
         }
-        endShape(CLOSE);
-
-        stroke('#FF5252');
-        beginShape();
-        for (let p of this.particles) {
-            vertex(p.x, p.y);
-        }
+        curveVertex(this.vertices[1].x, this.vertices[1].y);
         endShape();
 
-        stroke('#C2C2C2');
-        for (let p of this.particles) {
-            ellipse(p.x, p.y, this.bodySize);
-        }
+        if (false) {
+        	noFill();
+	        stroke('#FF5252');
+	        beginShape();
+	        for (let p of this.particles) {
+	            vertex(p.x, p.y);
+	        }
+	        endShape();
+
+	        stroke('#FFACAC');
+	        for (let p of this.particles) {
+	            ellipse(p.x, p.y, 5);
+	        }
+    	}
     }
 
 
